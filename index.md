@@ -4,12 +4,12 @@
 
 ### Category Name 1 
 
-[Project 1 Title](/sample_page)
+[Project 1 Product_View MVVM](https://github.com/hmshohrab/Product_view_mvvm)
 <img src="images/Screenshot_2020-06-04-10-45-28.png?raw=true"/>
-src="images/Screenshot_2020-06-04-10-45-28.png?raw=true"/>
+<img src="images/Screenshot_2020-06-04-10-45-28.png?raw=true"/>
 
 ---
-//[Project 2 Title](/pdf/sample_presentation.pdf)
+[Project 2 Title](/pdf/sample_presentation.pdf)
 <img src="images/Screenshot_2020-06-04-10-45-28.png?raw=true"/>
 
 ---
