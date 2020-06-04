@@ -6,6 +6,7 @@
 
 [Project 1 Title](/sample_page)
 <img src="images/Screenshot_2020-06-04-10-45-28.png?raw=true"/>
+src="images/Screenshot_2020-06-04-10-45-28.png?raw=true"/>
 
 ---
 //[Project 2 Title](/pdf/sample_presentation.pdf)
