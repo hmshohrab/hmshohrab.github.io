@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Page</title>
+</head>
+<body>
+    <script>
+        // Prompting user for password
+        var password = prompt("Enter password:");
+
+        // Compare the entered password with the correct password
+        if (password === "hmshohrab") {
+            // Display the content if the password is correct
+            // document.write("<h1>Welcome to the secure page!</h1>");
+                 // Make a fetch request to load content from a file
+        fetch('me.html')
+            .then(response => {
+                // Check if the response was successful
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Return the response text
+                return response.text();
+            })
+            .then(content => {
+                // Write the content to the document
+                document.write(content);
+            })
+            .catch(error => {
+                // Display an error message if something went wrong
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        } else {
+            // Redirect or display an error message if the password is incorrect
+            alert("Incorrect password!");
+            // Example redirect:
+            // window.location.href = "https://example.com";
+        }
+    </script>
+</body>
+</html>
