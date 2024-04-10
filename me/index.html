@@ -4,40 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Page</title>
+    <style>
+        .container {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        .form {
+            margin-bottom: 20px;
+        }
+
+        input[type="password"] {
+            padding: 10px;
+            width: 200px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .content {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <div id="passwordForm" class="form">
+            <input type="password" id="password" placeholder="Enter password">
+            <button id="submitBtn">Submit</button>
+        </div>
+        <div id="contentContainer" class="content"></div>
+    </div>
     <script>
-        // Prompting user for password
-        var password = prompt("Enter password:");
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordForm = document.getElementById("passwordForm");
+            const passwordInput = document.getElementById("password");
+            const submitBtn = document.getElementById("submitBtn");
+            const contentContainer = document.getElementById("contentContainer");
 
-        // Compare the entered password with the correct password
-        if (password === "hmshohrab") {
-            // Display the content if the password is correct
-            // document.write("<h1>Welcome to the secure page!</h1>");
-                 // Make a fetch request to load content from a file
-        fetch('me.html')
-            .then(response => {
-                // Check if the response was successful
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+            submitBtn.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                const enteredPassword = passwordInput.value;
+                const correctPassword = "hmshohrab"; // Replace with your password
+
+                if (enteredPassword === correctPassword) {
+                    showContent();
+                } else {
+                    alert("Incorrect password. Please try again.");
+                    passwordInput.value = ""; // Clear password input
                 }
-                // Return the response text
-                return response.text();
-            })
-            .then(content => {
-                // Write the content to the document
-                document.write(content);
-            })
-            .catch(error => {
-                // Display an error message if something went wrong
-                console.error('There was a problem with the fetch operation:', error);
             });
-        } else {
-            // Redirect or display an error message if the password is incorrect
-            alert("Incorrect password!");
-            // Example redirect:
-            // window.location.href = "https://example.com";
-        }
+
+            function showContent() {
+                passwordForm.style.display = "none"; // Hide password form
+                contentContainer.innerHTML = `
+                    <h2>Welcome to the secured area!</h2>
+                    <p>This is the content you can access.</p>
+                `;
+                contentContainer.style.display = "block"; // Display content
+
+                fetch("me.html")
+                        .then(response => response.text())
+                        .then(data => {
+                            contentContainer.innerHTML = ""; // Clear previous content
+                            document.write(data); // Write content to document
+                        })
+                        .catch(error => {
+                            console.error('Error fetching content:', error);
+                        });
+            }
+        });
     </script>
 </body>
 </html>
