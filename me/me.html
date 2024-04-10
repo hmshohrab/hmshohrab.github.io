@@ -780,29 +780,46 @@
 		var track = (xx) => {
 
 			var userStatusDatabaseRef = firebase.database().ref('/tempUser/' + xx);
-
-			var isOfflineForDatabase = {
-				state: 'offline',
-				last_changed: firebase.database.ServerValue.TIMESTAMP,
-				userAgent: navigator.userAgent,
-				platform: navigator.platform
-			};
-
-			var isOnlineForDatabase = {
+			var data = {
 				state: 'online',
 				last_changed: firebase.database.ServerValue.TIMESTAMP,
 				userAgent: navigator.userAgent,
-				platform: navigator.platform
+				platform: navigator.platform,
+				hit: 0
 			};
 
 			firebase.database().ref('.info/connected').on('value', function (snapshot) {
+				console.log("Connect Status: ",snapshot.val());
 				if (snapshot.val() == false) {
 					return;
 				};
 
-				userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function () {
-					userStatusDatabaseRef.set(isOnlineForDatabase);
-				});
+
+				userStatusDatabaseRef.once('value')
+					.then(function (snapshot) {
+						if (snapshot.exists()) {
+							let value = snapshot.val();
+
+							data = value;
+							data.hit = data.hit + 1;
+							console.log(data);
+							// Data exists, perform the update operation
+							userStatusDatabaseRef.onDisconnect().set({ ...data, state: "offline" })
+								.then(function () {
+									userStatusDatabaseRef.set({ ...data, state: "online" });
+								});
+						} else {
+							userStatusDatabaseRef.set(data);
+							// Data does not exist, handle accordingly (e.g., log an error or take alternative action)
+							console.log("Data does not exist at this location");
+						}
+					})
+					.catch(function (error) {
+						// Handle errors
+						console.error("Error fetching data:", error);
+					});
+
+
 			});
 			checkOnline()
 
@@ -821,33 +838,18 @@
 		}
 
 		function checkOnline() {
-			// firebase.database().ref('/tempUser/').orderByChild('state').equalTo("online").on("value", (data => {
-			// 	var liveVisitorCounter = data.numChildren();
-			// 	console.log(liveVisitorCounter);
-			// 	var root = document.getElementById('root');
-			// 	root.innerText = liveVisitorCounter;
-
-			// }))
-			// Update per-user visit counter
-			var user = getCookie("tracking");
-			if (user != "") {
-				firebase.database().ref('/userVisits/' + user).once("value").then(snapshot => {
-					var userVisitCounter = snapshot.val() || 0;
-					firebase.database().ref('/userVisits/' + user).set(userVisitCounter + 1);
-				});
-			}
-			firebase.database().ref('/userVisits/').once("value").then(snapshot => {
+			firebase.database().ref('/tempUser/').once("value").then(snapshot => {
 				let totalVisits = 0;
 
 				snapshot.forEach(userSnapshot => {
-					const userVisitCounter = userSnapshot.val() || 0;
+					const userVisitCounter = userSnapshot.val().hit || 0;
 					totalVisits += userVisitCounter;
 				});
 
 				console.log("Total visits:", totalVisits);
 
 				var root = document.getElementById('root');
-				root.innerText = `BioData Views : ${totalVisits}`;
+				root.innerText = `BioData Views: ${totalVisits}`;
 			});
 
 		}
