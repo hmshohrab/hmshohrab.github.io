@@ -838,19 +838,14 @@
 		}
 
 		function checkOnline() {
-			firebase.database().ref('/tempUser/').once("value").then(snapshot => {
-				let totalVisits = 0;
+			firebase.database().ref('/userVisits/').once("value").then(snapshot => {
+					var userVisitCounter = snapshot.val() || 0;
+					firebase.database().ref('/userVisits/').set(userVisitCounter + 1);
 
-				snapshot.forEach(userSnapshot => {
-					const userVisitCounter = userSnapshot.val().hit || 0;
-					totalVisits += userVisitCounter;
-				});
-
-				console.log("Total visits:", totalVisits);
 
 				var root = document.getElementById('root');
-				root.innerText = `BioData Views: ${totalVisits}`;
-			});
+				root.innerText = `BioData Views: ${userVisitCounter}`;
+				});
 
 		}
 	</script>
