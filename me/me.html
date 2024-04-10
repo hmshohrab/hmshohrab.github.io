@@ -21,6 +21,7 @@
 	<link rel="stylesheet" href="./assets/me-frontend.css">
 	<!-- Google tag (gtag.js) -->
 	<script async="" src="./assets/js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.1.2/firebase.js"></script>
 </head>
 
 <body class="frontend.public.biodata.content">
@@ -718,10 +719,11 @@
 										</div>
 									</div>
 								</div>
-								<a href="https://hmshohrab.github.io/me">
-									<img
-										src="https://visitcount.itsvg.in/api?id=shohrab-bio&label=Bio-Data%20Views&color=3&pretty=true" />
-								</a>
+								<div style="display: flex; flex: 1; align-items: center; justify-content: center;">
+									<a href="https://hmshohrab.github.io/me">
+										<label id="root" style="font-size: 20px; font-weight: bold;">...</label>
+									</a>
+								</div>
 
 
 							</div>
@@ -736,7 +738,120 @@
 
 	<div id="od_toasts"></div>
 
+	<script defer type='text/javascript'>
+		// Your web app's Firebase configuration
+		//for reference goto https://firebase.google.com/docs/database/web/start
+		const firebaseConfig = {
+			apiKey: "AIzaSyA9dIvXtsbAae3lfR_2e3vx5L-CCD3685Q",
+			authDomain: "hmshohrab1998.firebaseapp.com",
+			databaseURL: "https://hmshohrab1998-default-rtdb.asia-southeast1.firebasedatabase.app",
+			projectId: "hmshohrab1998",
+			storageBucket: "hmshohrab1998.appspot.com",
+			messagingSenderId: "891095395064",
+			appId: "1:891095395064:web:acf875b7fda8a7d3c1290d",
+			measurementId: "G-E4V1FYVTYK"
+		};
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+		console.log(firebase.database());
+	</script>
+	<script>
+		function setCookie(cname, cvalue, exdays) {
+			var d = new Date();
+			d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+			var expires = "expires=" + d.toUTCString();
+			document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+		}
 
+		function getCookie(cname) {
+			var name = cname + "=";
+			var ca = document.cookie.split(';');
+			for (var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') {
+					c = c.substring(1);
+				}
+				if (c.indexOf(name) == 0) {
+					return c.substring(name.length, c.length);
+				}
+			}
+			return "";
+		}
+		var track = (xx) => {
+
+			var userStatusDatabaseRef = firebase.database().ref('/tempUser/' + xx);
+
+			var isOfflineForDatabase = {
+				state: 'offline',
+				last_changed: firebase.database.ServerValue.TIMESTAMP,
+				userAgent: navigator.userAgent,
+				platform: navigator.platform
+			};
+
+			var isOnlineForDatabase = {
+				state: 'online',
+				last_changed: firebase.database.ServerValue.TIMESTAMP,
+				userAgent: navigator.userAgent,
+				platform: navigator.platform
+			};
+
+			firebase.database().ref('.info/connected').on('value', function (snapshot) {
+				if (snapshot.val() == false) {
+					return;
+				};
+
+				userStatusDatabaseRef.onDisconnect().set(isOfflineForDatabase).then(function () {
+					userStatusDatabaseRef.set(isOnlineForDatabase);
+				});
+			});
+			checkOnline()
+
+		}
+		var user = getCookie("tracking");
+		if (user != "") {
+			console.log("Welcome again " + user);
+			track(user)
+		} else {
+			user = Date.now().toString(16);
+			if (user != "" && user != null) {
+				console.log("Welcome new user " + user);
+				setCookie("tracking", user, 365);
+				track(user)
+			}
+		}
+
+		function checkOnline() {
+			// firebase.database().ref('/tempUser/').orderByChild('state').equalTo("online").on("value", (data => {
+			// 	var liveVisitorCounter = data.numChildren();
+			// 	console.log(liveVisitorCounter);
+			// 	var root = document.getElementById('root');
+			// 	root.innerText = liveVisitorCounter;
+
+			// }))
+			// Update per-user visit counter
+			var user = getCookie("tracking");
+			if (user != "") {
+				firebase.database().ref('/userVisits/' + user).once("value").then(snapshot => {
+					var userVisitCounter = snapshot.val() || 0;
+					firebase.database().ref('/userVisits/' + user).set(userVisitCounter + 1);
+				});
+			}
+			firebase.database().ref('/userVisits/').once("value").then(snapshot => {
+				let totalVisits = 0;
+
+				snapshot.forEach(userSnapshot => {
+					const userVisitCounter = userSnapshot.val() || 0;
+					totalVisits += userVisitCounter;
+				});
+
+				console.log("Total visits:", totalVisits);
+
+				var root = document.getElementById('root');
+				root.innerText = `BioData Views : ${totalVisits}`;
+			});
+
+		}
+	</script>
 
 
 	<!-- https://code.jquery.com/jquery-1.8.3.min.js -->
